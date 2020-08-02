@@ -10,7 +10,10 @@ namespace Service.ViewModels
         public string Name { get; set; }
         public string ShortDescription { get; set; }
         public string DetailedDescription { get; set; }
-        public string Specification { get; set; }
+        public string SeoPageTitle { get; set; }
+        public string SeoAlias { get; set; }
+        public string SeoKeywords { get; set; }
+        public string SeoDescription { get; set; }
 
         public ProductViewModel Product { get; set; }
         public LanguageViewModel Language { get; set; }

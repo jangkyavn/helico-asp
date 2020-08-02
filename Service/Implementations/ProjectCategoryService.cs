@@ -106,13 +106,20 @@ namespace Service.Implementations
             await DeleteAsync(projectCategoryVM.Id);
         }
 
-        public async Task<List<ProjectCategoryViewModel>> GetAllAsync()
+        public async Task<List<ProjectCategoryViewModel>> GetAllAsync(string languageId)
         {
-            List<ProjectCategoryViewModel> result = await _dataContext.ProjectCategories
-               .OrderBy(x => x.Position)
-               .ProjectTo<ProjectCategoryViewModel>(_mapper.ConfigurationProvider)
-               .ToListAsync();
+            IQueryable<ProjectCategoryViewModel> query = from pc in _dataContext.ProjectCategories
+                                                         join pct in _dataContext.ProjectCategoryTranslations
+                                                         on pc.Id equals pct.ProjectCategoryId
+                                                         where pct.LanguageId == languageId
+                                                         orderby pc.Position
+                                                         select new ProjectCategoryViewModel
+                                                         {
+                                                             Id = pc.Id,
+                                                             Name = pct.Name
+                                                         };
 
+            List<ProjectCategoryViewModel> result = await query.ToListAsync();
             return result;
         }
 

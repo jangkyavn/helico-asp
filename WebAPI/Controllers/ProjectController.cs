@@ -1,39 +1,37 @@
 ﻿using Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Storage;
 using Service.Helpers;
 using Service.Interfaces;
 using Service.ViewModels;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebAPI.Extentions;
 
 namespace WebAPI.Controllers
 {
-    public class ProjectCategoryController : BaseController
+    public class ProjectController : BaseController
     {
-        private readonly IProjectCategoryService _projectCategoryService;
+        private readonly IProjectService _projectService;
 
-        public ProjectCategoryController(
+        public ProjectController(
             DataContext dataContext,
-            IProjectCategoryService projectCategoryService) : base(dataContext)
+            IProjectService projectService
+            ) : base(dataContext)
         {
-            _projectCategoryService = projectCategoryService;
+            _projectService = projectService;
         }
 
-        [HttpGet("{languageId}")]
-        public async Task<IActionResult> GetAll(string languageId)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            List<ProjectCategoryViewModel> data = await _projectCategoryService.GetAllAsync(languageId);
+            List<ProjectViewModel> data = await _projectService.GetAllAsync();
             return Ok(data);
         }
 
         [HttpGet("getAllPaging")]
         public async Task<IActionResult> GetAllPaging([FromQuery] PagingParams pagingParams)
         {
-            PagedList<ProjectCategoryViewModel> paged = await _projectCategoryService.GetAllPagingAsync(pagingParams);
+            PagedList<ProjectViewModel> paged = await _projectService.GetAllPagingAsync(pagingParams);
             Response.AddPagination(paged.CurrentPage, paged.PageSize, paged.TotalCount, paged.TotalPages);
             return Ok(paged.Items);
         }
@@ -46,7 +44,7 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProjectCategoryViewModel data = await _projectCategoryService.GetByIdAsync(id, languageId);
+            ProjectViewModel data = await _projectService.GetByIdAsync(id, languageId);
             if (data == null)
             {
                 return NotFound();
@@ -56,19 +54,19 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProjectCategoryViewModel projectCategoryVM)
+        public async Task<IActionResult> Create(ProjectViewModel projectCategoryVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            ProjectCategoryViewModel result = await _projectCategoryService.CreateAsync(projectCategoryVM);
+            ProjectViewModel result = await _projectService.CreateAsync(projectCategoryVM);
             return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ProjectCategoryViewModel projectCategoryVM)
+        public async Task<IActionResult> Update(ProjectViewModel projectCategoryVM)
         {
             if (!ModelState.IsValid)
             {
@@ -80,33 +78,15 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProjectCategoryViewModel data = await _projectCategoryService
+            ProjectViewModel data = await _projectService
                 .GetByIdAsync(projectCategoryVM.Id, projectCategoryVM.LanguageId);
             if (data == null)
             {
                 return NotFound();
             }
 
-            await _projectCategoryService.UpdateAsync(projectCategoryVM);
+            await _projectService.UpdateAsync(projectCategoryVM);
             return Ok(true);
-        }
-
-        [HttpPut("ChangePosition")]
-        public async Task<IActionResult> ChangePosition(List<ProjectCategoryViewModel> list)
-        {
-            using (IDbContextTransaction transaction = _dataContext.Database.BeginTransaction())
-            {
-                try
-                {
-                    await _projectCategoryService.ChangePositionAsync(list);
-                    transaction.Commit();
-                    return Ok(true);
-                }
-                catch (Exception e)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
-                }
-            }
         }
 
         [HttpDelete("{id}")]
@@ -117,13 +97,13 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            bool check = await _projectCategoryService.AnyAsync(id);
+            bool check = await _projectService.AnyAsync(id);
             if (check == false)
             {
                 return NotFound();
             }
 
-            await _projectCategoryService.DeleteAsync(id);
+            await _projectService.DeleteAsync(id);
             return Ok(true);
         }
     }
