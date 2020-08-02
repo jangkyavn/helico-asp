@@ -7,7 +7,7 @@ namespace Service.Interfaces
 {
     public interface IProductCategoryService
     {
-        Task<ProductCategoryViewModel> GetByIdAsync(string id);
+        Task<ProductCategoryViewModel> GetByIdAsync(string id, string languageId);
         Task<List<ProductCategoryViewModel>> GetAllAsync();
         Task<PagedList<ProductCategoryViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProductCategoryViewModel> CreateAsync(ProductCategoryViewModel productCategoryVM);
@@ -15,5 +15,6 @@ namespace Service.Interfaces
         Task ChangePositionAsync(List<ProductCategoryViewModel> listVM);
         Task DeleteAsync(string id);
         Task DeleteAsync(ProductCategoryViewModel productCategoryVM);
+        Task<bool> AnyAsync(string id);
     }
 }

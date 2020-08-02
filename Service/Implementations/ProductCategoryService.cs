@@ -5,6 +5,7 @@ using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Helpers;
 using Service.Interfaces;
+using Service.ManualMapper;
 using Service.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace Service.Implementations
             _mapper = mapper;
         }
 
+        public async Task<bool> AnyAsync(string id)
+        {
+            bool result = await _dataContext.ProductCategories.AnyAsync(x => x.Id == id);
+            return result;
+        }
+
         public async Task ChangePositionAsync(List<ProductCategoryViewModel> listVM)
         {
             int count = 1;
@@ -42,7 +49,7 @@ namespace Service.Implementations
 
             if (_dataContext.ProductCategories.Any())
             {
-                int maxPosition = await _dataContext.ProductCategories.MaxAsync(x => x.Position);
+                int? maxPosition = await _dataContext.ProductCategories.MaxAsync(x => x.Position);
                 productCategory.Position = maxPosition + 1;
             }
             else
@@ -50,9 +57,36 @@ namespace Service.Implementations
                 productCategory.Position = 1;
             }
 
+            productCategory.ProductCategoryTranslations.Add(new ProductCategoryTranslation
+            {
+                LanguageId = productCategoryVM.LanguageId,
+                Name = productCategoryVM.Name,
+                SeoPageTitle = productCategoryVM.SeoPageTitle,
+                SeoAlias = productCategoryVM.SeoAlias,
+                SeoKeywords = productCategoryVM.SeoKeywords,
+                SeoDescription = productCategoryVM.SeoDescription
+            });
+
+            List<Language> otherLanguages = await _dataContext.Languages
+                .Where(x => x.Id != productCategoryVM.LanguageId)
+                .ToListAsync();
+
+            foreach (Language item in otherLanguages)
+            {
+                productCategory.ProductCategoryTranslations.Add(new ProductCategoryTranslation
+                {
+                    LanguageId = item.Id,
+                    Name = productCategoryVM.Name,
+                    SeoPageTitle = productCategoryVM.SeoPageTitle,
+                    SeoAlias = productCategoryVM.SeoAlias,
+                    SeoKeywords = productCategoryVM.SeoKeywords,
+                    SeoDescription = productCategoryVM.SeoDescription
+                });
+            }
+
             await _dataContext.AddAsync(productCategory);
             await _dataContext.SaveChangesAsync();
-            ProductCategoryViewModel result = _mapper.Map<ProductCategoryViewModel>(productCategory);
+            ProductCategoryViewModel result = productCategoryVM.Mapper(productCategory);
             return result;
         }
 
@@ -134,20 +168,40 @@ namespace Service.Implementations
                 .CreateAsync(query, @params.PageNumber, @params.PageSize);
         }
 
-        public async Task<ProductCategoryViewModel> GetByIdAsync(string id)
+        public async Task<ProductCategoryViewModel> GetByIdAsync(string id, string languageId)
         {
-            ProductCategory productCategory = await _dataContext.ProductCategories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
+            ProductCategoryViewModel result = await (from pc in _dataContext.ProductCategories
+                                                     join pct in _dataContext.ProductCategoryTranslations
+                                                     on pc.Id equals pct.ProductCategoryId
+                                                     where pc.Id == id && pct.LanguageId == languageId
+                                                     select new ProductCategoryViewModel
+                                                     {
+                                                         Id = pc.Id,
+                                                         Position = pc.Position,
+                                                         Name = pct.Name,
+                                                         SeoPageTitle = pct.SeoPageTitle,
+                                                         SeoAlias = pct.SeoAlias,
+                                                         SeoKeywords = pct.SeoKeywords,
+                                                         SeoDescription = pct.SeoDescription,
+                                                         LanguageId = pct.LanguageId,
+                                                         CreatedBy = pc.CreatedBy,
+                                                         CreatedDate = pc.CreatedDate,
+                                                         Status = pc.Status
+                                                     }).FirstOrDefaultAsync();
 
-            ProductCategoryViewModel result = _mapper.Map<ProductCategoryViewModel>(productCategory);
             return result;
         }
 
         public async Task UpdateAsync(ProductCategoryViewModel productCategoryVM)
         {
-            ProductCategory productCategory = _mapper.Map<ProductCategory>(productCategoryVM);
-            _dataContext.ProductCategories.Update(productCategory);
+            ProductCategoryTranslation productCategoryTrans = await _dataContext.ProductCategoryTranslations
+                .FirstOrDefaultAsync(x => x.ProductCategoryId == productCategoryVM.Id && x.LanguageId == productCategoryVM.LanguageId);
+
+            productCategoryTrans.Name = productCategoryVM.Name;
+            productCategoryTrans.SeoPageTitle = productCategoryVM.SeoPageTitle;
+            productCategoryTrans.SeoAlias = productCategoryVM.SeoAlias;
+            productCategoryTrans.SeoKeywords = productCategoryVM.SeoKeywords;
+            productCategoryTrans.SeoDescription = productCategoryVM.SeoDescription;
             await _dataContext.SaveChangesAsync();
         }
     }

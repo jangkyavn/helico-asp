@@ -38,15 +38,15 @@ namespace WebAPI.Controllers
             return Ok(paged.Items);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        [HttpGet("{id}/{languageId}")]
+        public async Task<IActionResult> GetById(string id, string languageId)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest();
             }
 
-            ProductCategoryViewModel data = await _productCategoryService.GetByIdAsync(id);
+            ProductCategoryViewModel data = await _productCategoryService.GetByIdAsync(id, languageId);
             if (data == null)
             {
                 return NotFound();
@@ -64,7 +64,7 @@ namespace WebAPI.Controllers
             }
 
             ProductCategoryViewModel result = await _productCategoryService.CreateAsync(productCategoryVM);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
         }
 
         [HttpPut]
@@ -80,7 +80,8 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProductCategoryViewModel data = await _productCategoryService.GetByIdAsync(productCategoryVM.Id);
+            ProductCategoryViewModel data = await _productCategoryService
+                .GetByIdAsync(productCategoryVM.Id, productCategoryVM.LanguageId);
             if (data == null)
             {
                 return NotFound();
@@ -116,8 +117,8 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProductCategoryViewModel data = await _productCategoryService.GetByIdAsync(id);
-            if (data == null)
+            bool check = await _productCategoryService.AnyAsync(id);
+            if (check == false)
             {
                 return NotFound();
             }

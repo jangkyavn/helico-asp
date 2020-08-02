@@ -6,6 +6,6 @@ namespace Data.Entities
     {
         public string Id { get; set; }
         public string Image { get; set; }
-        public int Position { get; set; }
+        public int? Position { get; set; }
     }
 }
