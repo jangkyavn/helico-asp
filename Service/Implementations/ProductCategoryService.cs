@@ -37,10 +37,12 @@ namespace Service.Implementations
             int count = 1;
             foreach (ProductCategoryViewModel item in listVM)
             {
-                item.Position = count;
-                await UpdateAsync(item);
+                ProductCategory productCategory = await _dataContext.ProductCategories
+                    .FirstOrDefaultAsync(x => x.Id == item.Id);
+                productCategory.Position = count;
                 count += 1;
             }
+            await _dataContext.SaveChangesAsync();
         }
 
         public async Task<ProductCategoryViewModel> CreateAsync(ProductCategoryViewModel productCategoryVM)
@@ -84,7 +86,7 @@ namespace Service.Implementations
                 });
             }
 
-            await _dataContext.AddAsync(productCategory);
+            await _dataContext.ProductCategories.AddAsync(productCategory);
             await _dataContext.SaveChangesAsync();
             ProductCategoryViewModel result = productCategoryVM.Mapper(productCategory);
             return result;
@@ -95,7 +97,7 @@ namespace Service.Implementations
             ProductCategory productCategory = await _dataContext
                 .ProductCategories.FirstOrDefaultAsync(x => x.Id == id);
 
-            _dataContext.Remove(productCategory);
+            _dataContext.ProductCategories.Remove(productCategory);
             await _dataContext.SaveChangesAsync();
         }
 
