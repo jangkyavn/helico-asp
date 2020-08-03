@@ -54,38 +54,38 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProjectViewModel projectCategoryVM)
+        public async Task<IActionResult> Create(ProjectViewModel projectVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            ProjectViewModel result = await _projectService.CreateAsync(projectCategoryVM);
+            ProjectViewModel result = await _projectService.CreateAsync(projectVM);
             return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ProjectViewModel projectCategoryVM)
+        public async Task<IActionResult> Update(ProjectViewModel projectVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (string.IsNullOrEmpty(projectCategoryVM.Id))
+            if (string.IsNullOrEmpty(projectVM.Id))
             {
                 return BadRequest();
             }
 
             ProjectViewModel data = await _projectService
-                .GetByIdAsync(projectCategoryVM.Id, projectCategoryVM.LanguageId);
+                .GetByIdAsync(projectVM.Id, projectVM.LanguageId);
             if (data == null)
             {
                 return NotFound();
             }
 
-            await _projectService.UpdateAsync(projectCategoryVM);
+            await _projectService.UpdateAsync(projectVM);
             return Ok(true);
         }
 

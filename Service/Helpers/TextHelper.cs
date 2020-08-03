@@ -36,5 +36,13 @@ namespace Service.Helpers
 
             return Regex.Replace(value, @"\s+", " ").Trim();
         }
+
+        public static string GetOriginalImageName(this string value)
+        {
+            int lastMinus = value.LastIndexOf('-');
+            int lastDot = value.LastIndexOf('.');
+            string result = value.Remove(lastMinus, lastDot - lastMinus);
+            return result;
+        }
     }
 }

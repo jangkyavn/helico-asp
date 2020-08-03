@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Data;
 using Data.Entities;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Service.Helpers;
 using Service.Interfaces;
@@ -17,13 +18,16 @@ namespace Service.Implementations
     {
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         public ProjectService(
             DataContext dataContext,
-            IMapper mapper)
+            IMapper mapper,
+            IHostingEnvironment hostingEnvironment)
         {
             _dataContext = dataContext;
             _mapper = mapper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public async Task<bool> AnyAsync(string id)
@@ -78,6 +82,15 @@ namespace Service.Implementations
             Project project = await _dataContext
                 .Projects.FirstOrDefaultAsync(x => x.Id == id);
 
+            if (!string.IsNullOrEmpty(project.Image))
+            {
+                string filePath = _hostingEnvironment.WebRootPath + Constants.ProjectImagePath + project.Image;
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
             _dataContext.Projects.Remove(project);
             await _dataContext.SaveChangesAsync();
         }
@@ -111,6 +124,8 @@ namespace Service.Implementations
                                                  select new ProjectViewModel
                                                  {
                                                      Id = p.Id,
+                                                     Image = p.Image,
+                                                     ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
                                                      Name = pt.Name,
                                                      Description = pt.Description,
                                                      Content = pt.Content,
@@ -122,11 +137,11 @@ namespace Service.Implementations
                 string keyword = @params.Keyword.ToUpper().ToTrim();
 
                 query = query.Where(x => x.Name.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                        x.Name.ToUpper().Contains(keyword) ||
-                                        x.Description.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                        x.Description.ToUpper().Contains(keyword) ||
-                                        x.CategoryName.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                        x.CategoryName.ToUpper().Contains(keyword));
+                                                x.Name.ToUpper().Contains(keyword) ||
+                                                x.Description.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                                x.Description.ToUpper().Contains(keyword) ||
+                                                x.CategoryName.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                                x.CategoryName.ToUpper().Contains(keyword));
             }
 
             if (!string.IsNullOrEmpty(@params.SortValue))
@@ -187,6 +202,9 @@ namespace Service.Implementations
                                              {
                                                  Id = p.Id,
                                                  CategoryId = p.CategoryId,
+                                                 Image = p.Image,
+                                                 ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
+                                                 ImageName = p.Image.GetOriginalImageName(),
                                                  Name = pt.Name,
                                                  Description = pt.Description,
                                                  Content = pt.Content,

@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
 namespace Service.ViewModels
@@ -8,7 +9,10 @@ namespace Service.ViewModels
         public string Id { get; set; }
         public string CategoryId { get; set; }
         public string Image { get; set; }
+        public string ImageBase64 { get; set; }
 
+        public string ImageName { get; set; }
+        public List<IFormFile> Files { get; set; }
         public string LanguageId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
