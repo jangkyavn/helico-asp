@@ -9,6 +9,7 @@ using Service.Interfaces;
 using Service.ManualMapper;
 using Service.ViewModels;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -84,10 +85,10 @@ namespace Service.Implementations
 
             if (!string.IsNullOrEmpty(project.Image))
             {
-                string filePath = _hostingEnvironment.WebRootPath + Constants.ProjectImagePath + project.Image;
-                if (System.IO.File.Exists(filePath))
+                string filePath = Path.Combine(_hostingEnvironment.WebRootPath, Constants.ProjectImagePath + project.Image);
+                if (File.Exists(filePath))
                 {
-                    System.IO.File.Delete(filePath);
+                    File.Delete(filePath);
                 }
             }
 
@@ -223,6 +224,11 @@ namespace Service.Implementations
 
         public async Task UpdateAsync(ProjectViewModel projectVM)
         {
+            Project project = await _dataContext.Projects.FirstOrDefaultAsync(x => x.Id == projectVM.Id);
+            project.CategoryId = projectVM.CategoryId;
+            project.Image = projectVM.Image;
+            project.Status = projectVM.Status;
+
             ProjectTranslation projectTrans = await _dataContext.ProjectTranslations
                 .FirstOrDefaultAsync(x => x.ProjectId == projectVM.Id && x.LanguageId == projectVM.LanguageId);
 

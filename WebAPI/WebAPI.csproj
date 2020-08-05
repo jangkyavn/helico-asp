@@ -19,6 +19,7 @@
     <Folder Include="ClientApp\" />
     <Folder Include="wwwroot\" />
     <Folder Include="Services\" />
+    <Folder Include="wwwroot\uploaded\images\projects\" />
   </ItemGroup>
 
   <ItemGroup>

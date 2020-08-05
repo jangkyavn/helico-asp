@@ -24,7 +24,11 @@ namespace WebAPI.Controllers
             IFormFile file = @params.File;
             if (file == null)
             {
-                return new OkObjectResult(string.Empty);
+                return new OkObjectResult(new FileResponse
+                {
+                    FileName = string.Empty,
+                    FilePath = string.Empty
+                });
             }
             else
             {

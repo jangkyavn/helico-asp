@@ -7,34 +7,35 @@ using Service.Interfaces;
 using Service.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Extentions;
 
 namespace WebAPI.Controllers
 {
-    public class ProjectController : BaseController
+    public class ProductController : BaseController
     {
-        private readonly IProjectService _projectService;
+        private readonly IProductService _productService;
 
-        public ProjectController(
+        public ProductController(
             DataContext dataContext,
-            IProjectService projectService
+            IProductService productService
             ) : base(dataContext)
         {
-            _projectService = projectService;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<ProjectViewModel> data = await _projectService.GetAllAsync();
+            List<ProductViewModel> data = await _productService.GetAllAsync();
             return Ok(data);
         }
 
         [HttpGet("getAllPaging")]
         public async Task<IActionResult> GetAllPaging([FromQuery] PagingParams pagingParams)
         {
-            PagedList<ProjectViewModel> paged = await _projectService.GetAllPagingAsync(pagingParams);
+            PagedList<ProductViewModel> paged = await _productService.GetAllPagingAsync(pagingParams);
             Response.AddPagination(paged.CurrentPage, paged.PageSize, paged.TotalCount, paged.TotalPages);
             return Ok(paged.Items);
         }
@@ -47,7 +48,7 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProjectViewModel data = await _projectService.GetByIdAsync(id, languageId);
+            ProductViewModel data = await _productService.GetByIdAsync(id, languageId);
             if (data == null)
             {
                 return NotFound();
@@ -57,7 +58,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProjectViewModel projectVM)
+        public async Task<IActionResult> Create(ProductViewModel productVM)
         {
             if (!ModelState.IsValid)
             {
@@ -68,7 +69,7 @@ namespace WebAPI.Controllers
             {
                 try
                 {
-                    ProjectViewModel result = await _projectService.CreateAsync(projectVM);
+                    ProductViewModel result = await _productService.CreateAsync(productVM);
                     transaction.Commit();
                     return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
                 }
@@ -80,19 +81,19 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ProjectViewModel projectVM)
+        public async Task<IActionResult> Update(ProductViewModel productVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (string.IsNullOrEmpty(projectVM.Id))
+            if (string.IsNullOrEmpty(productVM.Id))
             {
                 return BadRequest();
             }
 
-            bool data = await _projectService.AnyAsync(projectVM.Id);
+            bool data = await _productService.AnyAsync(productVM.Id);
             if (data == false)
             {
                 return NotFound();
@@ -102,7 +103,7 @@ namespace WebAPI.Controllers
             {
                 try
                 {
-                    await _projectService.UpdateAsync(projectVM);
+                    await _productService.UpdateAsync(productVM);
                     transaction.Commit();
                     return Ok(true);
                 }
@@ -121,13 +122,13 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            bool check = await _projectService.AnyAsync(id);
+            bool check = await _productService.AnyAsync(id);
             if (check == false)
             {
                 return NotFound();
             }
 
-            await _projectService.DeleteAsync(id);
+            await _productService.DeleteAsync(id);
             return Ok(true);
         }
     }
