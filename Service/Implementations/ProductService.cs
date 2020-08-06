@@ -228,7 +228,6 @@ namespace Service.Implementations
             Product product = await _dataContext.Products.FirstOrDefaultAsync(x => x.Id == productVM.Id);
             product.CategoryId = productVM.CategoryId;
             product.Image = productVM.Image;
-            product.IsTypical = productVM.IsTypical;
             product.Status = productVM.Status;
 
             ProductTranslation productTrans = await _dataContext.ProductTranslations

@@ -23,10 +23,10 @@ namespace WebAPI.Controllers
             _productCategoryService = productCategoryService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("{languageId}")]
+        public async Task<IActionResult> GetAll(string languageId)
         {
-            List<ProductCategoryViewModel> data = await _productCategoryService.GetAllAsync();
+            List<ProductCategoryViewModel> data = await _productCategoryService.GetAllAsync(languageId);
             return Ok(data);
         }
 

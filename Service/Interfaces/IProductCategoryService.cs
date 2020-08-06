@@ -8,7 +8,7 @@ namespace Service.Interfaces
     public interface IProductCategoryService
     {
         Task<ProductCategoryViewModel> GetByIdAsync(string id, string languageId);
-        Task<List<ProductCategoryViewModel>> GetAllAsync();
+        Task<List<ProductCategoryViewModel>> GetAllAsync(string languageId);
         Task<PagedList<ProductCategoryViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProductCategoryViewModel> CreateAsync(ProductCategoryViewModel productCategoryVM);
         Task UpdateAsync(ProductCategoryViewModel productCategoryVM);

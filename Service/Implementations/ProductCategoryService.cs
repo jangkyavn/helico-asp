@@ -106,14 +106,21 @@ namespace Service.Implementations
             await DeleteAsync(productCategoryVM.Id);
         }
 
-        public async Task<List<ProductCategoryViewModel>> GetAllAsync()
+        public async Task<List<ProductCategoryViewModel>> GetAllAsync(string languageId)
         {
-            List<ProductCategoryViewModel> productCategorysVM = await _dataContext.ProductCategories
-               .OrderBy(x => x.Position)
-               .ProjectTo<ProductCategoryViewModel>(_mapper.ConfigurationProvider)
-               .ToListAsync();
+            IQueryable<ProductCategoryViewModel> query = from pc in _dataContext.ProductCategories
+                                                         join pct in _dataContext.ProductCategoryTranslations
+                                                         on pc.Id equals pct.ProductCategoryId
+                                                         where pct.LanguageId == languageId
+                                                         orderby pc.Position
+                                                         select new ProductCategoryViewModel
+                                                         {
+                                                             Id = pc.Id,
+                                                             Name = pct.Name
+                                                         };
 
-            return productCategorysVM;
+            List<ProductCategoryViewModel> result = await query.ToListAsync();
+            return result;
         }
 
         public async Task<PagedList<ProductCategoryViewModel>> GetAllPagingAsync(PagingParams @params)
