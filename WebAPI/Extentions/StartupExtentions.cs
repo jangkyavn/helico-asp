@@ -202,6 +202,7 @@ namespace WebAPI.Extentions
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProjectCategoryService, ProjectCategoryService>();
             services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<ISlideService, SlideService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();

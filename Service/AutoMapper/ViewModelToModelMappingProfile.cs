@@ -23,6 +23,7 @@ namespace Service.AutoMapper
             CreateMap<ProjectCategoryViewModel, ProjectCategory>();
             CreateMap<ProjectTranslationViewModel, ProjectTranslation>();
             CreateMap<ProjectViewModel, Project>();
+            CreateMap<SlideViewModel, Slide>();
             CreateMap<RoleViewModel, Role>();
             CreateMap<UserViewModel, User>();
         }

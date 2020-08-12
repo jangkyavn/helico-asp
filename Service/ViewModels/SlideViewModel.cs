@@ -1,8 +1,8 @@
 ﻿using Data.Models;
 
-namespace Data.Entities
+namespace Service.ViewModels
 {
-    public class Slide : AuditableEntity
+    public class SlideViewModel : AuditableEntity
     {
         public string Id { get; set; }
         public string Title_VN { get; set; }
@@ -13,5 +13,8 @@ namespace Data.Entities
         public string Url_VN { get; set; }
         public string Url_EN { get; set; }
         public int? Position { get; set; }
+
+        public string ImageBase64 { get; set; }
+        public string ImageName { get; set; }
     }
 }
