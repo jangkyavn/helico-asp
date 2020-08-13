@@ -24,37 +24,27 @@ namespace Data
         }
 
         public DbSet<AboutUs> AboutUs { get; set; }
-        public DbSet<AboutUsTranslation> AboutUsTranslations { get; set; }
         public DbSet<Entities.Action> Actions { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Diary> Diaries { get; set; }
         public DbSet<Function> Functions { get; set; }
-        public DbSet<Language> Languages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
-        public DbSet<ProductCategoryTranslation> ProductCategoryTranslations { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductTranslation> ProductTranslations { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
-        public DbSet<ProjectCategoryTranslation> ProjectCategoryTranslations { get; set; }
-        public DbSet<ProjectTranslation> ProjectTranslations { get; set; }
         public DbSet<Slide> Slides { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new AboutUsTranslationConfiguration());
             builder.ApplyConfiguration(new PermissionConfiguration());
-            builder.ApplyConfiguration(new ProductCategoryTranslationConfiguration());
             builder.ApplyConfiguration(new ProductConfiguration());
             builder.ApplyConfiguration(new ProductImageConfiguration());
-            builder.ApplyConfiguration(new ProductTranslationConfiguration());
-            builder.ApplyConfiguration(new ProjectCategoryTranslationConfiguration());
-            builder.ApplyConfiguration(new ProjectTranslationConfiguration());
+            builder.ApplyConfiguration(new ProjectConfiguration());
             builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
         }

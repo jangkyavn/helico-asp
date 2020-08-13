@@ -5,7 +5,6 @@ using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Service.Helpers;
 using Service.Interfaces;
-using Service.ManualMapper;
 using Service.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,36 +58,9 @@ namespace Service.Implementations
                 productCategory.Position = 1;
             }
 
-            productCategory.ProductCategoryTranslations.Add(new ProductCategoryTranslation
-            {
-                LanguageId = productCategoryVM.LanguageId,
-                Name = productCategoryVM.Name,
-                SeoPageTitle = productCategoryVM.SeoPageTitle,
-                SeoAlias = productCategoryVM.SeoAlias,
-                SeoKeywords = productCategoryVM.SeoKeywords,
-                SeoDescription = productCategoryVM.SeoDescription
-            });
-
-            List<Language> otherLanguages = await _dataContext.Languages
-                .Where(x => x.Id != productCategoryVM.LanguageId)
-                .ToListAsync();
-
-            foreach (Language item in otherLanguages)
-            {
-                productCategory.ProductCategoryTranslations.Add(new ProductCategoryTranslation
-                {
-                    LanguageId = item.Id,
-                    Name = productCategoryVM.Name,
-                    SeoPageTitle = productCategoryVM.SeoPageTitle,
-                    SeoAlias = productCategoryVM.SeoAlias,
-                    SeoKeywords = productCategoryVM.SeoKeywords,
-                    SeoDescription = productCategoryVM.SeoDescription
-                });
-            }
-
             await _dataContext.ProductCategories.AddAsync(productCategory);
             await _dataContext.SaveChangesAsync();
-            ProductCategoryViewModel result = productCategoryVM.Mapper(productCategory);
+            ProductCategoryViewModel result = _mapper.Map<ProductCategoryViewModel>(productCategory);
             return result;
         }
 
@@ -106,47 +78,34 @@ namespace Service.Implementations
             await DeleteAsync(productCategoryVM.Id);
         }
 
-        public async Task<List<ProductCategoryViewModel>> GetAllAsync(string languageId)
+        public async Task<List<ProductCategoryViewModel>> GetAllAsync()
         {
-            IQueryable<ProductCategoryViewModel> query = from pc in _dataContext.ProductCategories
-                                                         join pct in _dataContext.ProductCategoryTranslations
-                                                         on pc.Id equals pct.ProductCategoryId
-                                                         where pct.LanguageId == languageId
-                                                         orderby pc.Position
-                                                         select new ProductCategoryViewModel
-                                                         {
-                                                             Id = pc.Id,
-                                                             Name = pct.Name
-                                                         };
+            List<ProductCategoryViewModel> result = await _dataContext.ProductCategories
+                .OrderBy(x => x.Position)
+                .ProjectTo<ProductCategoryViewModel>(_mapper.ConfigurationProvider)
+                .ToListAsync();
 
-            List<ProductCategoryViewModel> result = await query.ToListAsync();
             return result;
         }
 
         public async Task<PagedList<ProductCategoryViewModel>> GetAllPagingAsync(PagingParams @params)
         {
             IQueryable<ProductCategoryViewModel> query = from pc in _dataContext.ProductCategories
-                                                         join pct in _dataContext.ProductCategoryTranslations
-                                                         on pc.Id equals pct.ProductCategoryId
-                                                         where pct.LanguageId == @params.LanguageId
                                                          orderby pc.Position
                                                          select new ProductCategoryViewModel
                                                          {
                                                              Id = pc.Id,
                                                              Position = pc.Position,
-                                                             Name = pct.Name,
-                                                             SeoPageTitle = pct.SeoPageTitle,
-                                                             SeoAlias = pct.SeoAlias,
-                                                             SeoKeywords = pct.SeoKeywords,
-                                                             SeoDescription = pct.SeoDescription
+                                                             Name_VN = pc.Name_VN,
+                                                             Name_EN = pc.Name_EN
                                                          };
 
             if (!string.IsNullOrEmpty(@params.Keyword))
             {
                 string keyword = @params.Keyword.ToUpper().ToTrim();
 
-                query = query.Where(x => x.Name.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                        x.Name.ToUpper().Contains(keyword));
+                query = query.Where(x => x.Name_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                        x.Name_VN.ToUpper().Contains(keyword));
             }
 
             if (!string.IsNullOrEmpty(@params.SortValue))
@@ -156,11 +115,11 @@ namespace Service.Implementations
                     case "name":
                         if (@params.SortValue == "ascend")
                         {
-                            query = query.OrderBy(x => x.Name);
+                            query = query.OrderBy(x => x.Name_VN);
                         }
                         else
                         {
-                            query = query.OrderByDescending(x => x.Name);
+                            query = query.OrderByDescending(x => x.Name_VN);
                         }
                         break;
                     default:
@@ -177,22 +136,16 @@ namespace Service.Implementations
                 .CreateAsync(query, @params.PageNumber, @params.PageSize);
         }
 
-        public async Task<ProductCategoryViewModel> GetByIdAsync(string id, string languageId)
+        public async Task<ProductCategoryViewModel> GetByIdAsync(string id)
         {
             ProductCategoryViewModel result = await (from pc in _dataContext.ProductCategories
-                                                     join pct in _dataContext.ProductCategoryTranslations
-                                                     on pc.Id equals pct.ProductCategoryId
-                                                     where pc.Id == id && pct.LanguageId == languageId
+                                                     where pc.Id == id
                                                      select new ProductCategoryViewModel
                                                      {
                                                          Id = pc.Id,
                                                          Position = pc.Position,
-                                                         Name = pct.Name,
-                                                         SeoPageTitle = pct.SeoPageTitle,
-                                                         SeoAlias = pct.SeoAlias,
-                                                         SeoKeywords = pct.SeoKeywords,
-                                                         SeoDescription = pct.SeoDescription,
-                                                         LanguageId = pct.LanguageId,
+                                                         Name_VN = pc.Name_VN,
+                                                         Name_EN = pc.Name_EN,
                                                          CreatedBy = pc.CreatedBy,
                                                          CreatedDate = pc.CreatedDate,
                                                          Status = pc.Status
@@ -203,14 +156,8 @@ namespace Service.Implementations
 
         public async Task UpdateAsync(ProductCategoryViewModel productCategoryVM)
         {
-            ProductCategoryTranslation productCategoryTrans = await _dataContext.ProductCategoryTranslations
-                .FirstOrDefaultAsync(x => x.ProductCategoryId == productCategoryVM.Id && x.LanguageId == productCategoryVM.LanguageId);
-
-            productCategoryTrans.Name = productCategoryVM.Name;
-            productCategoryTrans.SeoPageTitle = productCategoryVM.SeoPageTitle;
-            productCategoryTrans.SeoAlias = productCategoryVM.SeoAlias;
-            productCategoryTrans.SeoKeywords = productCategoryVM.SeoKeywords;
-            productCategoryTrans.SeoDescription = productCategoryVM.SeoDescription;
+            ProductCategory productCategory = _mapper.Map<ProductCategory>(productCategoryVM);
+            _dataContext.ProductCategories.Update(productCategory);
             await _dataContext.SaveChangesAsync();
         }
     }

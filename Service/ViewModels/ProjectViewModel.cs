@@ -8,23 +8,20 @@ namespace Service.ViewModels
     {
         public string Id { get; set; }
         public string CategoryId { get; set; }
+        public string Name_VN { get; set; }
+        public string Name_EN { get; set; }
+        public string Description_VN { get; set; }
+        public string Description_EN { get; set; }
+        public string Content_VN { get; set; }
+        public string Content_EN { get; set; }
         public string Image { get; set; }
-        public string ImageBase64 { get; set; }
 
+        public string ImageBase64 { get; set; }
         public string ImageName { get; set; }
         public List<IFormFile> Files { get; set; }
-        public string LanguageId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Content { get; set; }
-        public string SeoPageTitle { get; set; }
-        public string SeoAlias { get; set; }
-        public string SeoKeywords { get; set; }
-        public string SeoDescription { get; set; }
-        public string CategoryName { get; set; }
+        public string CategoryName_VN { get; set; }
+        public string CategoryName_EN { get; set; }
 
         public ProjectCategoryViewModel ProjectCategory { get; set; }
-
-        public List<ProjectTranslationViewModel> ProjectTranslations { get; set; }
     }
 }

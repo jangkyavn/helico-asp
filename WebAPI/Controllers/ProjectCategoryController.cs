@@ -23,10 +23,10 @@ namespace WebAPI.Controllers
             _projectCategoryService = projectCategoryService;
         }
 
-        [HttpGet("{languageId}")]
-        public async Task<IActionResult> GetAll(string languageId)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            List<ProjectCategoryViewModel> data = await _projectCategoryService.GetAllAsync(languageId);
+            List<ProjectCategoryViewModel> data = await _projectCategoryService.GetAllAsync();
             return Ok(data);
         }
 
@@ -38,15 +38,15 @@ namespace WebAPI.Controllers
             return Ok(paged.Items);
         }
 
-        [HttpGet("{id}/{languageId}")]
-        public async Task<IActionResult> GetById(string id, string languageId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest();
             }
 
-            ProjectCategoryViewModel data = await _projectCategoryService.GetByIdAsync(id, languageId);
+            ProjectCategoryViewModel data = await _projectCategoryService.GetByIdAsync(id);
             if (data == null)
             {
                 return NotFound();
@@ -64,7 +64,7 @@ namespace WebAPI.Controllers
             }
 
             ProjectCategoryViewModel result = await _projectCategoryService.CreateAsync(projectCategoryVM);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut]
@@ -80,9 +80,8 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            ProjectCategoryViewModel data = await _projectCategoryService
-                .GetByIdAsync(projectCategoryVM.Id, projectCategoryVM.LanguageId);
-            if (data == null)
+            bool checkAny = await _projectCategoryService.AnyAsync(projectCategoryVM.Id);
+            if (checkAny == false)
             {
                 return NotFound();
             }

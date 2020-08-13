@@ -86,31 +86,6 @@ namespace Data
                 }
             }
 
-            if (!_context.Languages.Any())
-            {
-                List<Language> languages = new List<Language>
-                {
-                    new Language {
-                        Id = "vi",
-                        Name = "Việt Nam",
-                        CreatedDate = DateTime.Now,
-                        Image = "vietname.png",
-                        IsDefault = true,
-                        Status = true
-                    },
-                    new Language {
-                        Id = "en",
-                        Name = "English",
-                        CreatedDate = DateTime.Now,
-                        Image = "english.png",
-                        IsDefault = false,
-                        Status = true
-                    }
-                };
-
-                await _context.Languages.AddRangeAsync(languages);
-            }
-
             await _context.SaveChangesAsync();
         }
     }

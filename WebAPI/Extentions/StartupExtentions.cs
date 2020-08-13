@@ -196,7 +196,6 @@ namespace WebAPI.Extentions
             services.AddSingleton<IUserIdProvider, UserIdProvider>();
 
             services.AddScoped<IDiaryService, DiaryService>();
-            services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             services.AddScoped<IProductService, ProductService>();

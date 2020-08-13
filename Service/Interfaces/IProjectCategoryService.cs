@@ -7,8 +7,8 @@ namespace Service.Interfaces
 {
     public interface IProjectCategoryService
     {
-        Task<ProjectCategoryViewModel> GetByIdAsync(string id, string languageId);
-        Task<List<ProjectCategoryViewModel>> GetAllAsync(string languageId);
+        Task<ProjectCategoryViewModel> GetByIdAsync(string id);
+        Task<List<ProjectCategoryViewModel>> GetAllAsync();
         Task<PagedList<ProjectCategoryViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProjectCategoryViewModel> CreateAsync(ProjectCategoryViewModel projectCategoryVM);
         Task UpdateAsync(ProjectCategoryViewModel projectCategoryVM);

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Service.Helpers;
 using Service.Interfaces;
-using Service.ManualMapper;
 using Service.ViewModels;
 using System.Collections.Generic;
 using System.IO;
@@ -40,41 +39,9 @@ namespace Service.Implementations
         public async Task<ProjectViewModel> CreateAsync(ProjectViewModel projectVM)
         {
             Project project = _mapper.Map<Project>(projectVM);
-
-            project.ProjectTranslations.Add(new ProjectTranslation
-            {
-                LanguageId = projectVM.LanguageId,
-                Name = projectVM.Name,
-                Description = projectVM.Description,
-                Content = projectVM.Content,
-                SeoPageTitle = projectVM.SeoPageTitle,
-                SeoAlias = projectVM.SeoAlias,
-                SeoKeywords = projectVM.SeoKeywords,
-                SeoDescription = projectVM.SeoDescription
-            });
-
-            List<Language> otherLanguages = await _dataContext.Languages
-                .Where(x => x.Id != projectVM.LanguageId)
-                .ToListAsync();
-
-            foreach (Language item in otherLanguages)
-            {
-                project.ProjectTranslations.Add(new ProjectTranslation
-                {
-                    LanguageId = item.Id,
-                    Name = projectVM.Name,
-                    Description = projectVM.Description,
-                    Content = projectVM.Content,
-                    SeoPageTitle = projectVM.SeoPageTitle,
-                    SeoAlias = projectVM.SeoAlias,
-                    SeoKeywords = projectVM.SeoKeywords,
-                    SeoDescription = projectVM.SeoDescription
-                });
-            }
-
             await _dataContext.Projects.AddAsync(project);
             await _dataContext.SaveChangesAsync();
-            ProjectViewModel result = projectVM.Mapper(project);
+            ProjectViewModel result = _mapper.Map<ProjectViewModel>(project);
             return result;
         }
 
@@ -114,35 +81,33 @@ namespace Service.Implementations
         public async Task<PagedList<ProjectViewModel>> GetAllPagingAsync(PagingParams @params)
         {
             IQueryable<ProjectViewModel> query = from p in _dataContext.Projects
-                                                 join pt in _dataContext.ProjectTranslations
-                                                 on p.Id equals pt.ProjectId
-                                                 join pc in _dataContext.ProjectCategories
-                                                 on p.CategoryId equals pc.Id
-                                                 join pct in _dataContext.ProjectCategoryTranslations
-                                                 on pc.Id equals pct.ProjectCategoryId
-                                                 where pt.LanguageId == @params.LanguageId && pct.LanguageId == @params.LanguageId
+                                                 join pc in _dataContext.ProjectCategories on p.CategoryId equals pc.Id
                                                  orderby p.CreatedDate descending
                                                  select new ProjectViewModel
                                                  {
                                                      Id = p.Id,
                                                      Image = p.Image,
                                                      ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
-                                                     Name = pt.Name,
-                                                     Description = pt.Description,
-                                                     Content = pt.Content,
-                                                     CategoryName = pct.Name
+                                                     Name_VN = p.Name_VN ?? string.Empty,
+                                                     Name_EN = p.Name_EN ?? string.Empty,
+                                                     Description_VN = p.Description_VN ?? string.Empty,
+                                                     Description_EN = p.Description_EN ?? string.Empty,
+                                                     Content_VN = p.Content_VN ?? string.Empty,
+                                                     Content_EN = p.Content_EN ?? string.Empty,
+                                                     CategoryName_VN = pc.Name_VN ?? string.Empty,
+                                                     CategoryName_EN = pc.Name_EN ?? string.Empty
                                                  };
 
             if (!string.IsNullOrEmpty(@params.Keyword))
             {
                 string keyword = @params.Keyword.ToUpper().ToTrim();
 
-                query = query.Where(x => x.Name.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                                x.Name.ToUpper().Contains(keyword) ||
-                                                x.Description.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                                x.Description.ToUpper().Contains(keyword) ||
-                                                x.CategoryName.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                                x.CategoryName.ToUpper().Contains(keyword));
+                query = query.Where(x => x.Name_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                                x.Name_VN.ToUpper().Contains(keyword) ||
+                                                x.Description_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                                x.Description_VN.ToUpper().Contains(keyword) ||
+                                                x.CategoryName_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
+                                                x.CategoryName_VN.ToUpper().Contains(keyword));
             }
 
             if (!string.IsNullOrEmpty(@params.SortValue))
@@ -152,31 +117,31 @@ namespace Service.Implementations
                     case "name":
                         if (@params.SortValue == "ascend")
                         {
-                            query = query.OrderBy(x => x.Name);
+                            query = query.OrderBy(x => x.Name_VN);
                         }
                         else
                         {
-                            query = query.OrderByDescending(x => x.Name);
+                            query = query.OrderByDescending(x => x.Name_VN);
                         }
                         break;
                     case "description":
                         if (@params.SortValue == "ascend")
                         {
-                            query = query.OrderBy(x => x.Description);
+                            query = query.OrderBy(x => x.Description_VN);
                         }
                         else
                         {
-                            query = query.OrderByDescending(x => x.Description);
+                            query = query.OrderByDescending(x => x.Description_VN);
                         }
                         break;
                     case "categoryName":
                         if (@params.SortValue == "ascend")
                         {
-                            query = query.OrderBy(x => x.CategoryName);
+                            query = query.OrderBy(x => x.CategoryName_VN);
                         }
                         else
                         {
-                            query = query.OrderByDescending(x => x.CategoryName);
+                            query = query.OrderByDescending(x => x.CategoryName_VN);
                         }
                         break;
                     default:
@@ -193,12 +158,10 @@ namespace Service.Implementations
                 .CreateAsync(query, @params.PageNumber, @params.PageSize);
         }
 
-        public async Task<ProjectViewModel> GetByIdAsync(string id, string languageId)
+        public async Task<ProjectViewModel> GetByIdAsync(string id)
         {
             ProjectViewModel result = await (from p in _dataContext.Projects
-                                             join pt in _dataContext.ProjectTranslations
-                                             on p.Id equals pt.ProjectId
-                                             where p.Id == id && pt.LanguageId == languageId
+                                             where p.Id == id
                                              select new ProjectViewModel
                                              {
                                                  Id = p.Id,
@@ -206,14 +169,12 @@ namespace Service.Implementations
                                                  Image = p.Image,
                                                  ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
                                                  ImageName = p.Image.GetOriginalImageName(),
-                                                 Name = pt.Name,
-                                                 Description = pt.Description,
-                                                 Content = pt.Content,
-                                                 SeoPageTitle = pt.SeoPageTitle,
-                                                 SeoAlias = pt.SeoAlias,
-                                                 SeoKeywords = pt.SeoKeywords,
-                                                 SeoDescription = pt.SeoDescription,
-                                                 LanguageId = pt.LanguageId,
+                                                 Name_VN = p.Name_VN,
+                                                 Name_EN = p.Name_EN,
+                                                 Description_VN = p.Description_VN,
+                                                 Description_EN = p.Description_EN,
+                                                 Content_VN = p.Content_VN,
+                                                 Content_EN = p.Content_EN,
                                                  CreatedBy = p.CreatedBy,
                                                  CreatedDate = p.CreatedDate,
                                                  Status = p.Status
@@ -224,21 +185,8 @@ namespace Service.Implementations
 
         public async Task UpdateAsync(ProjectViewModel projectVM)
         {
-            Project project = await _dataContext.Projects.FirstOrDefaultAsync(x => x.Id == projectVM.Id);
-            project.CategoryId = projectVM.CategoryId;
-            project.Image = projectVM.Image;
-            project.Status = projectVM.Status;
-
-            ProjectTranslation projectTrans = await _dataContext.ProjectTranslations
-                .FirstOrDefaultAsync(x => x.ProjectId == projectVM.Id && x.LanguageId == projectVM.LanguageId);
-
-            projectTrans.Name = projectVM.Name;
-            projectTrans.Description = projectVM.Description;
-            projectTrans.Content = projectVM.Content;
-            projectTrans.SeoPageTitle = projectVM.SeoPageTitle;
-            projectTrans.SeoAlias = projectVM.SeoAlias;
-            projectTrans.SeoKeywords = projectVM.SeoKeywords;
-            projectTrans.SeoDescription = projectVM.SeoDescription;
+            Project project = _mapper.Map<Project>(projectVM);
+            _dataContext.Projects.Update(project);
             await _dataContext.SaveChangesAsync();
         }
     }

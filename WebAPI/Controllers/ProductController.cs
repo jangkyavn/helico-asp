@@ -40,15 +40,15 @@ namespace WebAPI.Controllers
             return Ok(paged.Items);
         }
 
-        [HttpGet("{id}/{languageId}")]
-        public async Task<IActionResult> GetById(string id, string languageId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest();
             }
 
-            ProductViewModel data = await _productService.GetByIdAsync(id, languageId);
+            ProductViewModel data = await _productService.GetByIdAsync(id);
             if (data == null)
             {
                 return NotFound();
@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
                 {
                     ProductViewModel result = await _productService.CreateAsync(productVM);
                     transaction.Commit();
-                    return CreatedAtAction(nameof(GetById), new { id = result.Id, languageId = result.LanguageId }, result);
+                    return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
                 }
                 catch (Exception e)
                 {

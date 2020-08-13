@@ -1,5 +1,4 @@
-﻿using Data.Enums;
-using System;
+﻿using System;
 
 namespace Data.Entities
 {

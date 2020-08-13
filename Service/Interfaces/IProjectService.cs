@@ -9,7 +9,7 @@ namespace Service.Interfaces
 {
     public interface IProjectService
     {
-        Task<ProjectViewModel> GetByIdAsync(string id, string languageId);
+        Task<ProjectViewModel> GetByIdAsync(string id);
         Task<List<ProjectViewModel>> GetAllAsync();
         Task<PagedList<ProjectViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProjectViewModel> CreateAsync(ProjectViewModel projectVM);

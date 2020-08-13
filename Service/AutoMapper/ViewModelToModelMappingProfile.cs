@@ -8,20 +8,14 @@ namespace Service.AutoMapper
     {
         public ViewModelToModelMappingProfile()
         {
-            CreateMap<AboutUsTranslationViewModel, AboutUsTranslation>();
             CreateMap<AboutUsViewModel, AboutUs>();
             CreateMap<ContactViewModel, Contact>();
             CreateMap<DiaryViewModel, Diary>();
-            CreateMap<LanguageViewModel, Language>();
             CreateMap<NotificationViewModel, Notification>();
-            CreateMap<ProductCategoryTranslationViewModel, ProductCategoryTranslation>();
             CreateMap<ProductCategoryViewModel, ProductCategory>();
             CreateMap<ProductImageViewModel, ProductImage>();
-            CreateMap<ProductTranslationViewModel, ProductTranslation>();
             CreateMap<ProductViewModel, Product>();
-            CreateMap<ProjectCategoryTranslationViewModel, ProjectCategoryTranslation>();
             CreateMap<ProjectCategoryViewModel, ProjectCategory>();
-            CreateMap<ProjectTranslationViewModel, ProjectTranslation>();
             CreateMap<ProjectViewModel, Project>();
             CreateMap<SlideViewModel, Slide>();
             CreateMap<RoleViewModel, Role>();
