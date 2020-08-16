@@ -10,7 +10,7 @@ namespace Service.Interfaces
     public interface IProjectService
     {
         Task<ProjectViewModel> GetByIdAsync(string id);
-        Task<List<ProjectViewModel>> GetAllAsync();
+        Task<List<ProjectViewModel>> GetAllAsync(int? top = null);
         Task<PagedList<ProjectViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProjectViewModel> CreateAsync(ProjectViewModel projectVM);
         Task UpdateAsync(ProjectViewModel projectVM);

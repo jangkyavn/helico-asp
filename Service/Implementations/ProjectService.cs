@@ -68,13 +68,36 @@ namespace Service.Implementations
             await DeleteAsync(projectVM.Id);
         }
 
-        public async Task<List<ProjectViewModel>> GetAllAsync()
+        public async Task<List<ProjectViewModel>> GetAllAsync(int? top = null)
         {
-            List<ProjectViewModel> result = await _dataContext.Projects
-              .OrderByDescending(x => x.CreatedDate)
-              .ProjectTo<ProjectViewModel>(_mapper.ConfigurationProvider)
-              .ToListAsync();
+            IQueryable<ProjectViewModel> query = from p in _dataContext.Projects
+                                                 join pc in _dataContext.ProjectCategories on p.CategoryId equals pc.Id
+                                                 join u in _dataContext.Users on p.CreatedBy.ToString() equals u.Id into tmpUsers
+                                                 from u in tmpUsers.DefaultIfEmpty()
+                                                 orderby p.CreatedDate descending
+                                                 select new ProjectViewModel
+                                                 {
+                                                     Id = p.Id,
+                                                     Image = p.Image,
+                                                     ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
+                                                     Name_VN = p.Name_VN ?? string.Empty,
+                                                     Name_EN = p.Name_EN ?? string.Empty,
+                                                     IsHighlight = p.IsHighlight,
+                                                     SelectedAsSlider = p.SelectedAsSlider,
+                                                     Content_VN = p.Content_VN ?? string.Empty,
+                                                     Content_EN = p.Content_EN ?? string.Empty,
+                                                     CategoryName_VN = pc.Name_VN ?? string.Empty,
+                                                     CategoryName_EN = pc.Name_EN ?? string.Empty,
+                                                     Status = p.Status,
+                                                     CreatedByName = u.UserName
+                                                 };
 
+            if (top.HasValue)
+            {
+                query = query.Take(top.Value);
+            }
+
+            List<ProjectViewModel> result = await query.ToListAsync();
             return result;
         }
 

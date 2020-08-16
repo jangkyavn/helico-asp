@@ -4,15 +4,30 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Service.Interfaces;
+using WebMVC.Helpers;
 using WebMVC.Models;
 
 namespace WebMVC.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IProjectService _projectService;
+
+        public HomeController(IProjectService projectService)
         {
-            return View();
+            _projectService = projectService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ViewData["BodyClass"] = "cms-index-index cms-home-page";
+
+            var homeVm = new HomeViewModel();
+            // homeVm.Title = _localizer["TITLE"];
+            homeVm.LatestProjects = await _projectService.GetAllAsync(4);
+
+            return View(homeVm);
         }
 
         public IActionResult Privacy()

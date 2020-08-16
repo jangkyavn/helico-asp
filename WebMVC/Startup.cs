@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Service.AutoMapper;
+using Service.Implementations;
+using Service.Interfaces;
 
 namespace WebMVC
 {
@@ -24,6 +28,14 @@ namespace WebMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>(options =>
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                                   o =>
+                                   {
+                                       o.MigrationsAssembly("Data");
+                                       o.UseRowNumberForPaging();
+                                   }));
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -32,7 +44,24 @@ namespace WebMVC
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                    .AddJsonOptions(options =>
+                    {
+                        options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.Formatting = Formatting.Indented;
+                        options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
+                    });
+
+            MapperConfiguration mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new ModelToViewModelMappingProfile());
+                mc.AddProfile(new ViewModelToModelMappingProfile());
+            });
+            services.AddSingleton(mappingConfig.CreateMapper());
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IProjectService, ProjectService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +84,11 @@ namespace WebMVC
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                  name: "project_detail",
+                  template: "{alias}-pj.{id}.html",
+                  defaults: new { controller = "Project", action = "Detail" });
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
