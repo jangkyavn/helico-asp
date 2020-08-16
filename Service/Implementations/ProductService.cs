@@ -98,7 +98,7 @@ namespace Service.Implementations
                                                      CategoryName_EN = pc.Name_EN ?? string.Empty,
                                                      IsHighlight = p.IsHighlight,
                                                      Price = p.Price,
-                                                     Quantity = p.Quantity
+                                                     Status = p.Status
                                                  };
 
             if (!string.IsNullOrEmpty(@params.Keyword))

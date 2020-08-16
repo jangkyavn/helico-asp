@@ -17,7 +17,6 @@ namespace Service.AutoMapper
             CreateMap<ProductViewModel, Product>();
             CreateMap<ProjectCategoryViewModel, ProjectCategory>();
             CreateMap<ProjectViewModel, Project>();
-            CreateMap<SlideViewModel, Slide>();
             CreateMap<RoleViewModel, Role>();
             CreateMap<UserViewModel, User>();
         }

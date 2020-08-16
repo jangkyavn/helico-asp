@@ -9,7 +9,6 @@ namespace Data.Entities
         public string CategoryId { get; set; }
         public string Name_VN { get; set; }
         public string Name_EN { get; set; }
-        public string ShortDescription { get; set; }
         public string ShortDescription_VN { get; set; }
         public string ShortDescription_EN { get; set; }
         public string DetailedDescription_VN { get; set; }

@@ -35,7 +35,6 @@ namespace Data
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectCategory> ProjectCategories { get; set; }
-        public DbSet<Slide> Slides { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

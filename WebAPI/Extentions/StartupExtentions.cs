@@ -195,13 +195,14 @@ namespace WebAPI.Extentions
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IUserIdProvider, UserIdProvider>();
 
+            services.AddScoped<IAboutUsService, AboutUsService>();
+            services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IDiaryService, DiaryService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProjectCategoryService, ProjectCategoryService>();
             services.AddScoped<IProjectService, ProjectService>();
-            services.AddScoped<ISlideService, SlideService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();

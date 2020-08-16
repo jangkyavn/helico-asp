@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200815141718_chane1")]
+    partial class chane1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -317,9 +319,11 @@ namespace Data.Migrations
 
                     b.Property<DateTime?>("CreatedDate");
 
-                    b.Property<string>("Image");
+                    b.Property<string>("Description_EN");
 
-                    b.Property<bool?>("IsHighlight");
+                    b.Property<string>("Description_VN");
+
+                    b.Property<string>("Image");
 
                     b.Property<Guid?>("ModifiedBy");
 
@@ -328,8 +332,6 @@ namespace Data.Migrations
                     b.Property<string>("Name_EN");
 
                     b.Property<string>("Name_VN");
-
-                    b.Property<bool?>("SelectedAsSlider");
 
                     b.Property<bool?>("Status");
 
@@ -402,6 +404,42 @@ namespace Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Data.Entities.Slide", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedDate");
+
+                    b.Property<string>("Description_EN");
+
+                    b.Property<string>("Description_VN");
+
+                    b.Property<string>("Image");
+
+                    b.Property<Guid?>("ModifiedBy");
+
+                    b.Property<DateTime?>("ModifiedDate");
+
+                    b.Property<int?>("Position");
+
+                    b.Property<bool?>("Status");
+
+                    b.Property<string>("Title_EN");
+
+                    b.Property<string>("Title_VN");
+
+                    b.Property<string>("Url_EN");
+
+                    b.Property<string>("Url_VN");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Slides");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>

@@ -90,8 +90,8 @@ namespace Service.Implementations
                                                      ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProjectImagePath),
                                                      Name_VN = p.Name_VN ?? string.Empty,
                                                      Name_EN = p.Name_EN ?? string.Empty,
-                                                     Description_VN = p.Description_VN ?? string.Empty,
-                                                     Description_EN = p.Description_EN ?? string.Empty,
+                                                     IsHighlight = p.IsHighlight,
+                                                     SelectedAsSlider = p.SelectedAsSlider,
                                                      Content_VN = p.Content_VN ?? string.Empty,
                                                      Content_EN = p.Content_EN ?? string.Empty,
                                                      CategoryName_VN = pc.Name_VN ?? string.Empty,
@@ -104,8 +104,6 @@ namespace Service.Implementations
 
                 query = query.Where(x => x.Name_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
                                                 x.Name_VN.ToUpper().Contains(keyword) ||
-                                                x.Description_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
-                                                x.Description_VN.ToUpper().Contains(keyword) ||
                                                 x.CategoryName_VN.ToUpper().ToUnSign().Contains(keyword.ToUnSign()) ||
                                                 x.CategoryName_VN.ToUpper().Contains(keyword));
             }
@@ -122,16 +120,6 @@ namespace Service.Implementations
                         else
                         {
                             query = query.OrderByDescending(x => x.Name_VN);
-                        }
-                        break;
-                    case "description":
-                        if (@params.SortValue == "ascend")
-                        {
-                            query = query.OrderBy(x => x.Description_VN);
-                        }
-                        else
-                        {
-                            query = query.OrderByDescending(x => x.Description_VN);
                         }
                         break;
                     case "categoryName":
@@ -171,8 +159,8 @@ namespace Service.Implementations
                                                  ImageName = p.Image.GetOriginalImageName(),
                                                  Name_VN = p.Name_VN,
                                                  Name_EN = p.Name_EN,
-                                                 Description_VN = p.Description_VN,
-                                                 Description_EN = p.Description_EN,
+                                                 IsHighlight = p.IsHighlight,
+                                                 SelectedAsSlider = p.SelectedAsSlider,
                                                  Content_VN = p.Content_VN,
                                                  Content_EN = p.Content_EN,
                                                  CreatedBy = p.CreatedBy,
