@@ -82,6 +82,8 @@ namespace Service.Implementations
         {
             IQueryable<ProjectViewModel> query = from p in _dataContext.Projects
                                                  join pc in _dataContext.ProjectCategories on p.CategoryId equals pc.Id
+                                                 join u in _dataContext.Users on p.CreatedBy.ToString() equals u.Id into tmpUsers
+                                                 from u in tmpUsers.DefaultIfEmpty()
                                                  orderby p.CreatedDate descending
                                                  select new ProjectViewModel
                                                  {
@@ -95,7 +97,9 @@ namespace Service.Implementations
                                                      Content_VN = p.Content_VN ?? string.Empty,
                                                      Content_EN = p.Content_EN ?? string.Empty,
                                                      CategoryName_VN = pc.Name_VN ?? string.Empty,
-                                                     CategoryName_EN = pc.Name_EN ?? string.Empty
+                                                     CategoryName_EN = pc.Name_EN ?? string.Empty,
+                                                     Status = p.Status,
+                                                     CreatedByName = u.UserName
                                                  };
 
             if (!string.IsNullOrEmpty(@params.Keyword))

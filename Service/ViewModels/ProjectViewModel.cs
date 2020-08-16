@@ -21,6 +21,7 @@ namespace Service.ViewModels
         public List<IFormFile> Files { get; set; }
         public string CategoryName_VN { get; set; }
         public string CategoryName_EN { get; set; }
+        public string CreatedByName { get; set; }
 
         public ProjectCategoryViewModel ProjectCategory { get; set; }
     }
