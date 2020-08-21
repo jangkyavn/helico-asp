@@ -2,8 +2,7 @@
     window.__env = window.__env || {};
 
     // API url
-    // window.__env.apiUrl = 'https://localhost:44333';
-    window.__env.apiUrl = 'https://create-hd.pmbk.vn';
+    window.__env.apiUrl = 'https://localhost:44333';
 
     window.__env.listImage = ['1', '2', '3', '4', '5', '6', '1', '8', '9'];
 
