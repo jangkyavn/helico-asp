@@ -4,6 +4,7 @@ using Data;
 using Data.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Service.Helpers;
 using Service.Interfaces;
 using Service.ViewModels;
@@ -19,15 +20,18 @@ namespace Service.Implementations
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
 
         public ProductService(
             DataContext dataContext,
             IMapper mapper,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IConfiguration configuration)
         {
             _dataContext = dataContext;
             _mapper = mapper;
             _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
         }
 
         public async Task<bool> AnyAsync(string id)
@@ -87,7 +91,7 @@ namespace Service.Implementations
                                                  {
                                                      Id = p.Id,
                                                      Image = p.Image,
-                                                     ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProductImagePath),
+                                                     ImageBase64 = p.Image.GetFullPath(_configuration, Constants.ProductImagePath),
                                                      Name_VN = p.Name_VN ?? string.Empty,
                                                      Name_EN = p.Name_EN ?? string.Empty,
                                                      ShortDescription_VN = p.ShortDescription_VN ?? string.Empty,
@@ -170,7 +174,7 @@ namespace Service.Implementations
                                                  Id = p.Id,
                                                  CategoryId = p.CategoryId,
                                                  Image = p.Image,
-                                                 ImageBase64 = p.Image.ConvertBase64(_hostingEnvironment, Constants.ProductImagePath),
+                                                 ImageBase64 = p.Image.GetFullPath(_configuration, Constants.ProductImagePath),
                                                  ImageName = p.Image.GetOriginalImageName(),
                                                  IsHighlight = p.IsHighlight,
                                                  Price = p.Price,

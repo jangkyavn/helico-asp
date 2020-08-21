@@ -93,7 +93,9 @@ namespace Service.Implementations
                                                      CategoryName_VN = pc.Name_VN ?? string.Empty,
                                                      CategoryName_EN = pc.Name_EN ?? string.Empty,
                                                      Status = p.Status,
-                                                     CreatedByName = u.UserName
+                                                     CreatedByName = u.UserName,
+                                                     UrlFriendly_VN = p.Name_VN.UrlFriendly(p.Name_VN.Length),
+                                                     UrlFriendly_EN = p.Name_EN.UrlFriendly(p.Name_EN.Length)
                                                  };
 
             if (top.HasValue)

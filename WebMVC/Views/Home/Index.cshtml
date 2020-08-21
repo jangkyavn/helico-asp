@@ -1070,9 +1070,13 @@
                 <div class="slider-items slider-width-col6">
                     @foreach (var item in Model.LatestProjects)
                     {
+                        var urlFriendly = $"/{item.UrlFriendly_VN}-pj.{item.Id}.html";
+
                         <div class="item">
                             <div class="blog-box">
-                                <a href="blog_single_post.html"> <img class="primary-img" src="@item.ImageBase64" alt="HTML template"></a>
+                                <a href="@urlFriendly" title="@item.Name_VN">
+                                    <img class="primary-img" src="@item.ImageBase64" alt="@item.Name_VN">
+                                </a>
                                 <div class="blog-btm-desc">
                                     <div class="blog-top-desc">
                                         <div class="blog-date"> 28 Jan 2017 </div>
