@@ -7,6 +7,7 @@ namespace WebMVC.Models
     {
         public List<ProjectViewModel> HomeSlides { get; set; }
         public List<ProjectViewModel> LatestProjects { get; set; }
+        public List<ProductViewModel> HightlightProducts { get; set; }
         public List<ProjectCategoryViewModel> HomeCategories { get; set; }
     }
 }

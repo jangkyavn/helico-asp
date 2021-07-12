@@ -204,6 +204,24 @@ namespace Service.Implementations
             return result;
         }
 
+        public async Task<List<ProjectViewModel>> GetSlidersAsync()
+        {
+            var result = await _dataContext.Projects
+               .Where(x => x.SelectedAsSlider == true)
+               .OrderBy(x => x.CreatedDate)
+               .Select(x => new ProjectViewModel
+               {
+                   Id = x.Id,
+                   Image = x.Image,
+                   ImageBase64 = x.Image.GetFullPath(_configuration, Constants.ProjectImagePath),
+                   Name_VN = x.Name_VN ?? string.Empty,
+                   Name_EN = x.Name_EN ?? string.Empty,
+               })
+               .ToListAsync();
+
+            return result;
+        }
+
         public async Task UpdateAsync(ProjectViewModel projectVM)
         {
             Project project = _mapper.Map<Project>(projectVM);

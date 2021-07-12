@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using WebAPI.Helpers;
 using WebAPI.Models;
 
@@ -68,6 +71,40 @@ namespace WebAPI.Controllers
                     FileName = fileName,
                     FilePath = Path.Combine(fileFolder, fileName).Replace(@"\", @"/")
                 });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("UploadImageForCKEditor")]
+        public async Task UploadImageForCKEditor(IList<IFormFile> upload, string CKEditorFuncNum, string folderName)
+        {
+            if (upload.Count == 0)
+            {
+                await HttpContext.Response.WriteAsync("Yêu cầu nhập ảnh");
+            }
+            else
+            {
+                var file = upload[0];
+                var filename = ContentDispositionHeaderValue
+                                    .Parse(file.ContentDisposition)
+                                    .FileName
+                                    .Trim('"');
+
+                var imageFolder = $@"\uploaded\images\{folderName}";
+
+                string folder = _hostingEnvironment.WebRootPath + imageFolder;
+
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+                string filePath = Path.Combine(folder, filename);
+                using (FileStream fs = System.IO.File.Create(filePath))
+                {
+                    file.CopyTo(fs);
+                    fs.Flush();
+                }
+                await HttpContext.Response.WriteAsync("<script>window.parent.CKEDITOR.tools.callFunction(" + CKEditorFuncNum + ", '" + Path.Combine(imageFolder, filename).Replace(@"\", @"/") + "');</script>");
             }
         }
     }

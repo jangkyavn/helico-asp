@@ -72,10 +72,11 @@ namespace Service.Implementations
             await DeleteAsync(productVM.Id);
         }
 
-        public async Task<List<ProductViewModel>> GetAllAsync()
+        public async Task<List<ProductViewModel>> GetAllAsync(int? top = null)
         {
             List<ProductViewModel> result = await _dataContext.Products
               .OrderByDescending(x => x.CreatedDate)
+              .Take(top.Value)
               .ProjectTo<ProductViewModel>(_mapper.ConfigurationProvider)
               .ToListAsync();
 

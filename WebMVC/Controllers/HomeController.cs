@@ -9,10 +9,12 @@ namespace WebMVC.Controllers
     public class HomeController : Controller
     {
         private readonly IProjectService _projectService;
+        private readonly IProductService _productService;
 
-        public HomeController(IProjectService projectService)
+        public HomeController(IProjectService projectService, IProductService productService)
         {
             _projectService = projectService;
+            _productService = productService;
         }
 
         public async Task<IActionResult> Index()
@@ -20,9 +22,9 @@ namespace WebMVC.Controllers
             ViewData["BodyClass"] = "cms-index-index cms-home-page";
 
             var homeVm = new HomeViewModel();
-            // homeVm.Title = _localizer["TITLE"];
+            homeVm.HomeSlides = await _projectService.GetSlidersAsync();
             homeVm.LatestProjects = await _projectService.GetAllAsync(4);
-
+            homeVm.HightlightProducts = await _productService.GetAllAsync(4);
             return View(homeVm);
         }
 

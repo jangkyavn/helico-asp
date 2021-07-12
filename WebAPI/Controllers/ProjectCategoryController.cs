@@ -8,7 +8,6 @@ using Service.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebAPI.Extentions;
 
 namespace WebAPI.Controllers
 {
@@ -30,12 +29,11 @@ namespace WebAPI.Controllers
             return Ok(data);
         }
 
-        [HttpGet("getAllPaging")]
-        public async Task<IActionResult> GetAllPaging([FromQuery] PagingParams pagingParams)
+        [HttpPost("getAllPaging")]
+        public async Task<IActionResult> GetAllPaging(PagingParams pagingParams)
         {
-            PagedList<ProjectCategoryViewModel> paged = await _projectCategoryService.GetAllPagingAsync(pagingParams);
-            Response.AddPagination(paged.CurrentPage, paged.PageSize, paged.TotalCount, paged.TotalPages);
-            return Ok(paged.Items);
+            var paged = await _projectCategoryService.GetAllPagingAsync(pagingParams);
+            return Ok(new { paged.CurrentPage, paged.PageSize, paged.TotalCount, paged.TotalPages, paged.Items });
         }
 
         [HttpGet("{id}")]

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ using Service.Implementations;
 using Service.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -245,8 +247,8 @@ namespace WebAPI.Extentions
             //app.UseStaticFiles(new StaticFileOptions
             //{
             //    FileProvider = new PhysicalFileProvider(
-            //    Path.Combine(Directory.GetCurrentDirectory(), "Assets/uploaded/docs/samples")),
-            //    RequestPath = "/samples"
+            //    Path.Combine(Directory.GetCurrentDirectory(), "uploaded/images/projects")),
+            //    RequestPath = "/projects"
             //});
         }
 

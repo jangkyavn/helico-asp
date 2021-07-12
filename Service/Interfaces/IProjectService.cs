@@ -11,6 +11,7 @@ namespace Service.Interfaces
     {
         Task<ProjectViewModel> GetByIdAsync(string id);
         Task<List<ProjectViewModel>> GetAllAsync(int? top = null);
+        Task<List<ProjectViewModel>> GetSlidersAsync();
         Task<PagedList<ProjectViewModel>> GetAllPagingAsync(PagingParams @params);
         Task<ProjectViewModel> CreateAsync(ProjectViewModel projectVM);
         Task UpdateAsync(ProjectViewModel projectVM);
